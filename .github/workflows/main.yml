@@ -166,8 +166,16 @@ jobs:
         ssh-keyscan -H ${{ secrets.HOST }} > ~/.ssh/known_hosts
         docker context create remote --docker host=ssh://${{ secrets.USER }}@${{ secrets.HOST }}
         docker context use remote
-        ssh ${{secrets.USER }}@${{ secrets.HOST }} "cd kittygram"
-        scp docker-compose.production.yml ${{secrets.USER }}@${{ secrets.HOST }}:/kittygram/
+    - name: Copy docker-compose.yml of server
+      run: |
+        scp -i ~/.ssh/id_rsa docker-compose.production.yml ${{ secrets.USER }}@${{ secrets.HOST }}:/home/${{ secrets.USER}}/kittygram/
+    - name: Update and restars container
+      run: |
+        ssh -i ~/.ssh/id_rsa ${{ secrets.USER }}@${{ secrets.HOST }} << EOF
+        cd /home/${{ secrets.USER}}/kittygram/
+        docker-compose pull
+        docker-compose up -d
+        EOF
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
