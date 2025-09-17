@@ -166,6 +166,7 @@ jobs:
         ssh-keyscan -H ${{ secrets.HOST }} > ~/.ssh/known_hosts
         docker context create remote --docker host=ssh://${{ secrets.USER }}@${{ secrets.HOST }}
         docker context use remote
+        docker pull ${{ secrets.DOCKER_USERNAME }}/kittygram_frontend:latest 
   send_message:
     runs-on: ubuntu-latest
     needs: deploy
